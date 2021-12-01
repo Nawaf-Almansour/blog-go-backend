@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/models"
 	"context"
 	"database/sql"
 	"flag"
@@ -26,6 +27,7 @@ type config struct {
 type application struct {
 	config config
 	logger *log.Logger
+	models models.Models
 }
 
 type AppStatus struct {
@@ -53,6 +55,7 @@ func main()  {
 	app := &application{
 		config: cfg,
 		logger: logger,
+		models: models.NewModels(db),
 	}
 
 	srv := &http.Server{
