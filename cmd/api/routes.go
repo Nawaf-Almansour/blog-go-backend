@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (app *application) routes() *httprouter.Router  {
+func (app *application) routes() http.Handler  {
 	router := httprouter.New()
 
 	router.HandlerFunc(http.MethodGet, "/status", app.statusHandler)
@@ -15,6 +15,6 @@ func (app *application) routes() *httprouter.Router  {
 
 
 
-	return router
+	return app.enableCORS(router)
 
 }

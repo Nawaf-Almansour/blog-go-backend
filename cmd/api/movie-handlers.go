@@ -15,7 +15,7 @@ func (app *application) getOneMovie(w http.ResponseWriter, r *http.Request) {
 		app.errorJSON(w, err)
 		return
 	}
-	app.logger.Println("id is ", id)
+	//app.logger.Println("id is ", id)
 
 	movie, err := app.models.DB.Get(id)
 	//movie := models.Movie{
@@ -30,6 +30,7 @@ func (app *application) getOneMovie(w http.ResponseWriter, r *http.Request) {
 	//	CreatedAt: time.Now(),
 	//	UpdatedAt: time.Now(),
 	//}
+
 err = app.writeJSON(w, http.StatusOK, movie, "movie")
 	if err != nil {
 		app.errorJSON(w, err)
