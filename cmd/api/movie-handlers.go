@@ -86,3 +86,19 @@ func (app *application) getAllMovies(w http.ResponseWriter, r *http.Request) {
 		 return
 	 }
  }
+
+
+func (app *application) editmovie(w http.ResponseWriter, r *http.Request) {
+	//params := httprouter.ParamsFromContext(r.Context())
+	type jsonResp struct {
+		OK bool `json:"ok"`
+	}
+	ok := jsonResp{
+		OK: true,
+	}
+	err := app.writeJSON(w, http.StatusOK, ok, "response")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+}
