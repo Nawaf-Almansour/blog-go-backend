@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/julienschmidt/httprouter"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -107,7 +108,7 @@ type MoviePayload struct {
 }
 
 
-func (app *application) editmovie(w http.ResponseWriter, r *http.Request) {
+func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
 	var payload MoviePayload
 
 	err := json.NewDecoder(r.Body).Decode(&payload)
@@ -115,7 +116,16 @@ func (app *application) editmovie(w http.ResponseWriter, r *http.Request) {
 		app.errorJSON(w, err)
 		return
 	}
+
 	var movie models.Movie
+
+	if payload.ID != "0" {
+		id, _ := strconv.Atoi(payload.ID)
+		m, _ := app.models.DB.Get(id)
+		movie = *m
+		movie.UpdatedAt = time.Now()
+	}
+
 		movie.ID, _ = strconv.Atoi(payload.ID)
 		movie.Title = payload.Title
 		movie.Description = payload.Description
@@ -128,12 +138,21 @@ func (app *application) editmovie(w http.ResponseWriter, r *http.Request) {
 		movie.CreatedAt = time.Now()
 		movie.UpdatedAt = time.Now()
 
-
-	err = app.models.DB.InsertMovie(movie)
-	if err != nil {
-		app.errorJSON(w, err)
-		return
-	}
+	if movie.ID == 0 {
+		log.Println("InsertMovie")
+		err = app.models.DB.InsertMovie(movie)
+		if err != nil {
+			app.errorJSON(w, err)
+			return
+		}
+	} else {
+			log.Println("UpdateMovie")
+			err = app.models.DB.UpdateMovie(movie)
+			if err != nil {
+				app.errorJSON(w, err)
+				return
+			}
+		}
 
 
 	ok := jsonResp{
