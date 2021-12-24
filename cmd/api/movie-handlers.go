@@ -107,6 +107,33 @@ type MoviePayload struct {
 	MPAARating 	string `json:"mpaa_rating"`
 }
 
+func (app *application) deleteMovie(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		app.errorJSON(w, err)
+		log.Println("InsertMovie", err)
+		return
+	}
+
+	err = app.models.DB.DeleteMovie(id)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	ok := jsonResp{
+		OK: true,
+	}
+
+	err = app.writeJSON(w, http.StatusOK, ok, "response")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+}
+
 
 func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
 	var payload MoviePayload
