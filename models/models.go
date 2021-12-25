@@ -46,3 +46,10 @@ type MovieGenre struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+// User is the type for users
+type User struct {
+	ID       int
+	Email    string
+	Password string
+}
