@@ -51,6 +51,6 @@ func (app *application) Singin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, jwtBytes, "reponse")
+	app.writeJSON(w, http.StatusOK, string(jwtBytes), "reponse")
 
 }
