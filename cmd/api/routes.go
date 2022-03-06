@@ -6,6 +6,7 @@ import (
 	"github.com/justinas/alice"
 	"net/http"
 )
+
 func (app *application) wrap(next http.Handler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		ctx := context.WithValue(r.Context(), "params", ps)
@@ -13,7 +14,7 @@ func (app *application) wrap(next http.Handler) httprouter.Handle {
 	}
 }
 
-func (app *application) routes() http.Handler  {
+func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	secure := alice.New(app.checkToken)
 
@@ -21,7 +22,7 @@ func (app *application) routes() http.Handler  {
 
 	router.HandlerFunc(http.MethodPost, "/v1/signin", app.Singin)
 
-	router.HandlerFunc(http.MethodPost, "/v1/graphql/list", app.moviesGraphQL)
+	router.HandlerFunc(http.MethodPost, "/v1/graphql", app.moviesGraphQL)
 
 	router.HandlerFunc(http.MethodGet, "/v1/movie/:id", app.getOneMovie)
 	router.HandlerFunc(http.MethodGet, "/v1/movies", app.getAllMovies)
@@ -34,7 +35,6 @@ func (app *application) routes() http.Handler  {
 
 	router.GET("/v1/admin/deletemovie/:id", app.wrap(secure.ThenFunc(app.deleteMovie)))
 	//router.HandlerFunc(http.MethodGet, "/v1/admin/deletemovie/:id", app.deleteMovie)
-
 
 	return app.enableCORS(router)
 

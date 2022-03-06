@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 )
 
 var movies []*models.Movie
@@ -16,7 +17,7 @@ var movies []*models.Movie
 // schema definition
 var fields = graphql.Fields{
 	"movie": &graphql.Field{
-		Type: movieType,
+		Type:        movieType,
 		Description: "Get movie by id",
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
@@ -36,10 +37,33 @@ var fields = graphql.Fields{
 		},
 	},
 	"list": &graphql.Field{
-		Type: graphql.NewList(movieType),
+		Type:        graphql.NewList(movieType),
 		Description: "Get all movies",
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			return movies, nil
+		},
+	},
+	"search": &graphql.Field{
+		Type:        graphql.NewList(movieType),
+		Description: "Search movies by title",
+		Args: graphql.FieldConfigArgument{
+			"titleContains": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			var theList []*models.Movie
+			search, ok := params.Args["titleContains"].(string)
+			if ok {
+				for _, currentMovie := range movies {
+					if strings.Contains(currentMovie.Title, search) {
+						log.Println("Found one")
+						theList = append(theList, currentMovie)
+					}
+				}
+			}
+			return theList, nil
+
 		},
 	},
 }
