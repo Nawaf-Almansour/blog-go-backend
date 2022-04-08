@@ -17,15 +17,14 @@ import (
 const version = "1.0.0"
 
 type config struct {
-	 port int
-	 env string
-	 db struct {
-		 dsn string
-	 }
-	 jwt struct {
-		 secret string
-	 }
-
+	port int
+	env  string
+	db   struct {
+		dsn string
+	}
+	jwt struct {
+		secret string
+	}
 }
 type application struct {
 	config config
@@ -34,21 +33,23 @@ type application struct {
 }
 
 type AppStatus struct {
-	Status string
+	Status      string
 	Environment string
-	Version string
+	Version     string
 }
 
-func main()  {
+func main() {
 	var cfg config
 
 	flag.IntVar(&cfg.port, "port", 4000, "Server port to listen on")
-	flag.StringVar(&cfg.env, "env","development", "Application environment (development | production)")
-	flag.StringVar(&cfg.db.dsn,"dsn","postgres://postgres@localhost/go_movies?sslmode=disable","Postgres connection string")
-	flag.StringVar(&cfg.jwt.secret, "jwt-secret","2dce505d96a53c5768052ee90f3df2055657518dad489160df9913f66042e160","secret")
+	flag.StringVar(&cfg.env, "env", "development", "Application environment (development | production)")
+	flag.StringVar(&cfg.db.dsn, "dsn", "postgres://postgres@localhost/go_movies?sslmode=disable", "Postgres connection string")
+	//flag.StringVar(&cfg.jwt.secret, "jwt-secret", "2dce505d96a53c5768052ee90f3df2055657518dad489160df9913f66042e160", "secret")
 	flag.Parse()
 
-	logger := log.New(os.Stderr, "", log.Ldate| log.Ltime)
+	cfg.jwt.secret = os.Getenv("GO_MOVIES_JWT")
+
+	logger := log.New(os.Stderr, "", log.Ldate|log.Ltime)
 
 	db, err := openDB(cfg)
 	if err != nil {
@@ -63,9 +64,9 @@ func main()  {
 	}
 
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%d", cfg.port),
-		Handler: app.routes(),
-		ReadTimeout: 10 * time.Second,
+		Addr:         fmt.Sprintf(":%d", cfg.port),
+		Handler:      app.routes(),
+		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
 	logger.Println("Starting server on port", cfg.port)
@@ -76,7 +77,7 @@ func main()  {
 	}
 }
 
-func openDB(cfg config) (*sql.DB, error)  {
+func openDB(cfg config) (*sql.DB, error) {
 	db, err := sql.Open("postgres", cfg.db.dsn)
 	if err != nil {
 		return nil, err
